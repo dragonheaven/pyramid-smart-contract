@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="vendor/bootstrap.min.css">
+    <title>PoSC</title>
+    <style>
+      .container { max-width: 47rem; }
+    </style>
+  </head>
+  <body>
+    <div class="container my-4">
+      <h1 class="text-center">Pyramid-Token</h1>
+      <h4 class="text-center">Stable coin by pyramid scheme.</h4>
+      <h4 class="text-center">Deposit. Earn dividends. Withdraw. Profit.</h4>
+      <div class="text-center">
+        [<a href="https://etherscan.io/address/">Contract</a>]
+        [<a href="https://discord.gg/">Discord</a>]
+      </div>
+      <div class="border border-dark my-3 p-3" style="font-size: 1.3rem">
+        <div class="row">
+          <div class="col text-right pr-0">Contract balance:</div>
+          <div id="contract-balance" class="col">Unavailable</div>
+        </div>
+        <div class="row">
+          <div class="col text-right pr-0">Total investment:</div>
+          <div id="total-investment" class="col">Unavailable</div>
+        </div>
+        <div class="row">
+          <div class="col text-right pr-0">Your investment:</div>
+          <div id="investment" class="col">Unavailable</div>
+        </div>
+        <div class="row">
+          <div class="col text-right pr-0">Your dividends:</div>
+          <div id="dividends" class="col">Unavailable</div>
+        </div>
+        <div class="row">
+          <div class="col text-right pr-0">Your stake:</div>
+          <div id="stake" class="col">Unavailable</div>
+        </div>
+        <div id="error" class="mt-2 text-center text-danger" style="display: none"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 col-sm-6 text-center mb-3">
+          <input id="deposit-input" class="form-control text-center mb-2" type="number" placeholder="Amount in ETH" min="0" step="0.01" disabled>
+          <button id="deposit-button"  type="button" class="btn btn-outline-primary" disabled>Deposit</button>
+        </div>
+        <div class="col-md-4 col-sm-6 text-center mb-3">
+          <input id="withdraw-input" class="form-control text-center mb-2" type="number" placeholder="Amount in ETH" min="0" step="0.01" disabled>
+          <button id="withdraw-button" class="btn btn-outline-primary mr-1" type="button" disabled>Withdraw</button>
+          <button id="fill-balance-button" class="btn btn-link p-0" disabled>Fill balance</button>
+        </div>
+        <div class="col-md-4 col-sm-12 text-center mb-3">
+          <input id="dividends-input" class="form-control text-center mb-2" type="text" placeholder="Dividends Unavailable" readonly>
+          <button id="claim-button" type="button" class="btn btn-outline-primary" disabled>Claim</button>
+          <button id="reinvest-button" type="button" class="btn btn-outline-primary mr-1" disabled>Reinvest</button>
+        </div>
+      </div>
+      <div class="border border-dark mb-3 p-3">
+        <div class="mb-3 text-center">100% fresh code. Novel staking mechanism. Stable investments. Pure dividends.</div>
+        <div class="mb-3"><span class="font-weight-bold">Issue:</span> Ordinary pyramid schemes have a token price that varies with the contract balance. This leaves you vulnerable to the whims of the market, as a sudden crash can drain your investment at any time.</div>
+        <div><span class="font-weight-bold">Solution:</span> We remove tokens from the equation altogether, which relieves investors of volatility. The outcome is a pyramid scheme powered entirely by dividends. We distribute 33% of every deposit and withdrawal to shareholders in proportion to their stake in the contract. Once you're in, your dividends will accumulate over time while your investment remains safe and stable, making this the ultimate vehicle for passive income.</div>
+      </div>
+      <div id="math" class="border border-dark my-3 p-3">
+        <div class="my-2 font-weight-bold">Overview</div>
+        In this note, we discuss the mathematical model under which the contract operates. For brevity, we denote the tax rate by $r = 1/3$.
+        <div class="my-2 font-weight-bold">Deposits</div>
+        <div class="my-2">
+          When a user makes a deposit $D$, a tax $r D$ is deducted and distributed amongst the current shareholders in proportion to their stake. The remainder $d = (1 - r) D$ is then safely stored away in escrow until the user requests a withdrawal.
+        </div>
+        <div class="my-2">
+          In return for this deposit, the user will receive a stake of all future dividends. The size of this stake depends both on the magnitude of the deposit and on the current stake level.
+        </div>
+        <div class="my-2">
+          We define our staking cost function to be $f(x) = 2 x$, where $x$ is measured in wei.
+          If the current total stake is given by $s$, where $s = 0$ at the start of the contract, a user who makes a post-tax deposit of $d$ wei will receive an incremental stake $t$ equal in value to their deposit:
+          $$\int_s^{s+t} f(x) \, dx = d.$$
+          Expanding the expression on the left, we have
+          $$\int_s^{s+t} 2 x \, dx = \left[ x^2 \right]_s^{s+t} = (s + t)^2 - s^2 = 2 s t + t^2.$$
+          Setting this equal to $d$ and solving for non-negative $t$ yields an incremental stake of
+          $$t = \frac{-2 s + \sqrt{4 s^2 + 4 d}}{2} = -s + \sqrt{s^2 + d}.$$
+        </div>
+        <div class="my-2 font-weight-bold">Withdrawals</div>
+        <div class="my-2">
+          When a user with stake $s$ and total investment $d$ requests a withdrawal of $w$, their stake is decremented by $w / d$, leaving them with a remaining stake of $(1 - w / d) s$. A withdrawal tax $r w$ is then deducted and distributed to shareholders according to the new staking proportions, and finally the remaining $(1 - r) w$ is returned back to the user.
+        </div>
+        <div class="my-2 font-weight-bold">Dividends</div>
+        <div class="my-2">
+          Dividends that have accrued via deposit and withdrawal taxes from other users can be claimed at any time. There is no tax or penalty for doing so, nor is there any impact on stake. The contract also provides the option to directly reinvest these dividends, saving on transaction fees.
+        </div>
+      </div>
+    </div>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [ ['$','$'], ['\\(','\\)'] ]}});</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+    <script src="vendor/jquery-3.3.1.min.js"></script>
+    <script src="vendor/popper.min.js"></script>
+    <script src="vendor/bootstrap.min.js"></script>
+    <script src="vendor/web3.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
